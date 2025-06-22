@@ -10,6 +10,7 @@ interface TrackingDetail {
   strActionDate: string;
   strActionTime: string;
   sTrRemarks: string;
+  strManifestNo: string; // Added missing property
 }
 
 interface TrackingHeader {
@@ -50,9 +51,9 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
   const getStatusColor = (status: string) => {
     const statusLower = status.toLowerCase();
     if (statusLower.includes('delivered')) return 'bg-secondary';
-    if (statusLower.includes('out for delivery')) return 'bg-neubrutalism-yellow';
-    if (statusLower.includes('transit') || statusLower.includes('picked')) return 'bg-neubrutalism-blue';
-    if (statusLower.includes('booked')) return 'bg-neubrutalism-purple';
+    if (statusLower.includes('out for delivery')) return 'bg-yellow-500';
+    if (statusLower.includes('transit') || statusLower.includes('picked')) return 'bg-blue-500';
+    if (statusLower.includes('booked')) return 'bg-purple-500';
     return 'bg-gray-400';
   };
 
@@ -70,31 +71,31 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
   const reversedDetails = [...trackDetails].reverse();
 
   return (
-    <div className="w-full max-w-4xl mx-auto animate-slide-up">
+    <div className="w-full max-w-4xl mx-auto">
       {/* Header Card */}
-      <Card className="mb-8 border-4 border-black shadow-neubrutalism-lg bg-white">
+      <Card className="mb-8 bg-white/20 backdrop-blur-md border border-white/30 shadow-xl">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h2 className="text-2xl font-black mb-4 text-primary">ORDER DETAILS</h2>
+              <h2 className="text-2xl font-bold mb-4 text-primary">ORDER DETAILS</h2>
               <div className="space-y-2">
-                <p><span className="font-bold">Order Number:</span> {trackHeader.strRefNo}</p>
-                <p><span className="font-bold">Tracking Number:</span> {trackHeader.strShipmentNo}</p>
-                <p><span className="font-bold">Status:</span> 
-                  <span className={`ml-2 px-3 py-1 rounded-full text-white font-bold ${getStatusColor(trackHeader.strStatus)}`}>
+                <p><span className="font-semibold">Order Number:</span> {trackHeader.strRefNo}</p>
+                <p><span className="font-semibold">Tracking Number:</span> {trackHeader.strShipmentNo}</p>
+                <p><span className="font-semibold">Status:</span> 
+                  <span className={`ml-2 px-3 py-1 rounded-full text-white font-semibold ${getStatusColor(trackHeader.strStatus)}`}>
                     {trackHeader.strStatus.toUpperCase()}
                   </span>
                 </p>
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-black mb-4 text-secondary">SHIPPING INFO</h3>
+              <h3 className="text-xl font-bold mb-4 text-secondary">SHIPPING INFO</h3>
               <div className="space-y-2">
-                <p><span className="font-bold">From:</span> {trackHeader.strOrigin}</p>
-                <p><span className="font-bold">To:</span> {trackHeader.strDestination}</p>
-                <p><span className="font-bold">Expected Delivery:</span> {formatDate(trackHeader.strExpectedDeliveryDate)}</p>
+                <p><span className="font-semibold">From:</span> {trackHeader.strOrigin}</p>
+                <p><span className="font-semibold">To:</span> {trackHeader.strDestination}</p>
+                <p><span className="font-semibold">Expected Delivery:</span> {formatDate(trackHeader.strExpectedDeliveryDate)}</p>
                 {trackHeader.strRemarks && (
-                  <p><span className="font-bold">Delivered To:</span> {trackHeader.strRemarks}</p>
+                  <p><span className="font-semibold">Delivered To:</span> {trackHeader.strRemarks}</p>
                 )}
               </div>
             </div>
@@ -103,42 +104,42 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
       </Card>
 
       {/* Timeline */}
-      <Card className="border-4 border-black shadow-neubrutalism-lg bg-white">
+      <Card className="bg-white/20 backdrop-blur-md border border-white/30 shadow-xl">
         <CardContent className="p-6">
-          <h3 className="text-2xl font-black mb-6 text-primary">TRACKING TIMELINE</h3>
+          <h3 className="text-2xl font-bold mb-6 text-primary">TRACKING TIMELINE</h3>
           <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute left-8 top-0 bottom-0 w-1 bg-black"></div>
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300"></div>
             
             {reversedDetails.map((detail, index) => (
               <div key={index} className="relative flex items-start mb-8 last:mb-0">
                 {/* Timeline Dot */}
-                <div className={`relative z-10 w-16 h-16 rounded-full border-4 border-black ${getStatusColor(detail.strAction)} flex items-center justify-center text-2xl shadow-neubrutalism`}>
+                <div className={`relative z-10 w-16 h-16 rounded-full border-2 border-white ${getStatusColor(detail.strAction)} flex items-center justify-center text-2xl shadow-lg`}>
                   {getStatusIcon(detail.strAction)}
                 </div>
                 
                 {/* Content */}
                 <div className="ml-6 flex-1">
-                  <div className={`p-4 border-4 border-black shadow-neubrutalism bg-white ${index === 0 ? 'animate-bounce-in' : ''}`}>
+                  <div className="p-4 bg-white/30 backdrop-blur-sm border border-white/20 rounded-lg shadow-lg">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-                      <h4 className="text-lg font-black text-primary">{detail.strAction.toUpperCase()}</h4>
-                      <div className="text-sm font-bold bg-neubrutalism-yellow px-2 py-1 border-2 border-black inline-block">
+                      <h4 className="text-lg font-bold text-primary">{detail.strAction.toUpperCase()}</h4>
+                      <div className="text-sm font-semibold bg-yellow-100 px-2 py-1 rounded inline-block">
                         {formatDate(detail.strActionDate)} at {formatTime(detail.strActionTime)}
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       {detail.strOrigin && (
-                        <p><span className="font-bold">Location:</span> {detail.strOrigin}</p>
+                        <p><span className="font-semibold">Location:</span> {detail.strOrigin}</p>
                       )}
                       {detail.strDestination && (
-                        <p><span className="font-bold">Destination:</span> {detail.strDestination}</p>
+                        <p><span className="font-semibold">Destination:</span> {detail.strDestination}</p>
                       )}
                       {detail.strManifestNo && (
-                        <p><span className="font-bold">Manifest:</span> {detail.strManifestNo}</p>
+                        <p><span className="font-semibold">Manifest:</span> {detail.strManifestNo}</p>
                       )}
                       {detail.sTrRemarks && detail.sTrRemarks.trim() !== '' && detail.sTrRemarks !== '0.00' && (
-                        <p><span className="font-bold">Remarks:</span> {detail.sTrRemarks}</p>
+                        <p><span className="font-semibold">Remarks:</span> {detail.sTrRemarks}</p>
                       )}
                     </div>
                   </div>

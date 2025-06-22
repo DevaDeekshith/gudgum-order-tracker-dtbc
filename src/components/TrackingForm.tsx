@@ -44,8 +44,13 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
         }),
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const data = await response.json();
@@ -74,24 +79,21 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
 
   return (
     <div className="w-full max-w-md mx-auto mb-8">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="relative">
           <Input
             type="text"
             placeholder="Enter your order number (e.g., GG26099)"
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
-            className="h-16 text-lg font-bold border-4 border-black shadow-neubrutalism focus:shadow-neubrutalism-lg transition-all duration-200 bg-white"
+            className="h-14 text-lg bg-white/20 backdrop-blur-md border border-white/30 shadow-lg focus:bg-white/30 focus:border-white/50 transition-all duration-200"
             disabled={isLoading}
           />
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">
-            #GG
-          </div>
         </div>
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-16 text-xl font-black bg-primary hover:bg-primary/90 text-white border-4 border-black shadow-neubrutalism hover:shadow-neubrutalism-lg transition-all duration-200 transform hover:-translate-y-1"
+          className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg backdrop-blur-md transition-all duration-200"
         >
           {isLoading ? 'TRACKING...' : 'TRACK YOUR ORDER'}
         </Button>

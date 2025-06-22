@@ -17,25 +17,25 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neubrutalism-yellow via-white to-neubrutalism-pink p-4">
+    <div className="min-h-screen bg-white p-4">
       <div className="container mx-auto py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-6xl md:text-8xl font-black text-primary mb-4 transform -rotate-1 animate-bounce-in">
+          <h1 className="text-5xl md:text-7xl font-bold text-primary mb-4">
             GUD GUM
           </h1>
-          <div className="bg-secondary text-white px-6 py-3 border-4 border-black shadow-neubrutalism-lg inline-block transform rotate-1">
-            <h2 className="text-2xl md:text-3xl font-black">TRACK YOUR ORDER</h2>
+          <div className="bg-secondary/90 backdrop-blur-md text-white px-6 py-3 border border-white/20 shadow-lg inline-block rounded-lg">
+            <h2 className="text-xl md:text-2xl font-semibold">TRACK YOUR ORDER</h2>
           </div>
         </div>
 
         {!trackingData ? (
           <div className="flex flex-col items-center">
-            <div className="bg-white p-8 border-4 border-black shadow-neubrutalism-lg max-w-md w-full">
+            <div className="bg-white/40 backdrop-blur-md p-8 border border-white/30 shadow-xl max-w-md w-full rounded-xl">
               <div className="text-center mb-6">
                 <div className="text-6xl mb-4">📦</div>
-                <p className="text-lg font-bold text-gray-700">
-                  Enter your order number to track your Gud Gum delivery!
+                <p className="text-lg font-medium text-gray-700">
+                  Enter your order number to track your Gud Gum delivery
                 </p>
               </div>
               <TrackingForm 
@@ -50,7 +50,7 @@ const Index = () => {
             <div className="text-center mb-8">
               <button
                 onClick={resetTracking}
-                className="bg-primary text-white px-6 py-3 font-black border-4 border-black shadow-neubrutalism hover:shadow-neubrutalism-lg transition-all duration-200 transform hover:-translate-y-1"
+                className="bg-primary/90 backdrop-blur-md text-white px-6 py-3 font-semibold border border-white/20 shadow-lg hover:bg-primary transition-all duration-200 rounded-lg"
               >
                 TRACK ANOTHER ORDER
               </button>
@@ -64,8 +64,8 @@ const Index = () => {
 
         {/* Footer */}
         <div className="text-center mt-16">
-          <div className="bg-black text-white px-4 py-2 border-4 border-black shadow-neubrutalism inline-block">
-            <p className="font-bold">Need help? Contact our support team!</p>
+          <div className="bg-black/80 backdrop-blur-md text-white px-4 py-2 shadow-lg inline-block rounded-lg">
+            <p className="font-medium">Need help? Contact our support team!</p>
           </div>
         </div>
       </div>
