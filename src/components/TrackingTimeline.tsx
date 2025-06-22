@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Upload, Clock, Calendar, Package, Truck, CheckCircle, MapPin } from 'lucide-react';
 
 interface TrackingDetail {
   strCode: string;
@@ -10,7 +11,7 @@ interface TrackingDetail {
   strActionDate: string;
   strActionTime: string;
   sTrRemarks: string;
-  strManifestNo: string; // Added missing property
+  strManifestNo: string;
 }
 
 interface TrackingHeader {
@@ -48,6 +49,67 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
     return `${hours}:${minutes}`;
   };
 
+  const getStatusDetails = (action: string) => {
+    const actionLower = action.toLowerCase();
+    
+    if (actionLower.includes('softdata upload')) {
+      return {
+        color: 'bg-gradient-to-br from-purple-500 to-purple-700',
+        icon: Upload,
+        iconColor: 'text-white'
+      };
+    }
+    if (actionLower.includes('pickup awaited')) {
+      return {
+        color: 'bg-gradient-to-br from-orange-500 to-red-500',
+        icon: Clock,
+        iconColor: 'text-white'
+      };
+    }
+    if (actionLower.includes('pickup schedule')) {
+      return {
+        color: 'bg-gradient-to-br from-blue-500 to-cyan-500',
+        icon: Calendar,
+        iconColor: 'text-white'
+      };
+    }
+    if (actionLower.includes('picked up')) {
+      return {
+        color: 'bg-gradient-to-br from-green-500 to-emerald-600',
+        icon: Package,
+        iconColor: 'text-white'
+      };
+    }
+    if (actionLower.includes('delivered')) {
+      return {
+        color: 'bg-gradient-to-br from-green-600 to-green-800',
+        icon: CheckCircle,
+        iconColor: 'text-white'
+      };
+    }
+    if (actionLower.includes('out for delivery')) {
+      return {
+        color: 'bg-gradient-to-br from-yellow-500 to-amber-600',
+        icon: Truck,
+        iconColor: 'text-white'
+      };
+    }
+    if (actionLower.includes('transit')) {
+      return {
+        color: 'bg-gradient-to-br from-indigo-500 to-purple-600',
+        icon: Package,
+        iconColor: 'text-white'
+      };
+    }
+    
+    // Default
+    return {
+      color: 'bg-gradient-to-br from-gray-500 to-gray-700',
+      icon: MapPin,
+      iconColor: 'text-white'
+    };
+  };
+
   const getStatusColor = (status: string) => {
     const statusLower = status.toLowerCase();
     if (statusLower.includes('delivered')) return 'bg-secondary';
@@ -55,16 +117,6 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
     if (statusLower.includes('transit') || statusLower.includes('picked')) return 'bg-blue-500';
     if (statusLower.includes('booked')) return 'bg-purple-500';
     return 'bg-gray-400';
-  };
-
-  const getStatusIcon = (action: string) => {
-    const actionLower = action.toLowerCase();
-    if (actionLower.includes('delivered')) return '✅';
-    if (actionLower.includes('out for delivery')) return '🚚';
-    if (actionLower.includes('transit')) return '📦';
-    if (actionLower.includes('picked')) return '📋';
-    if (actionLower.includes('booked')) return '📝';
-    return '📍';
   };
 
   // Reverse the order to show latest first
@@ -111,41 +163,46 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
             {/* Timeline Line */}
             <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300"></div>
             
-            {reversedDetails.map((detail, index) => (
-              <div key={index} className="relative flex items-start mb-8 last:mb-0">
-                {/* Timeline Dot */}
-                <div className={`relative z-10 w-16 h-16 rounded-full border-2 border-white ${getStatusColor(detail.strAction)} flex items-center justify-center text-2xl shadow-lg`}>
-                  {getStatusIcon(detail.strAction)}
-                </div>
-                
-                {/* Content */}
-                <div className="ml-6 flex-1">
-                  <div className="p-4 bg-white/30 backdrop-blur-sm border border-white/20 rounded-lg shadow-lg">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-                      <h4 className="text-lg font-bold text-primary">{detail.strAction.toUpperCase()}</h4>
-                      <div className="text-sm font-semibold bg-yellow-100 px-2 py-1 rounded inline-block">
-                        {formatDate(detail.strActionDate)} at {formatTime(detail.strActionTime)}
+            {reversedDetails.map((detail, index) => {
+              const statusDetails = getStatusDetails(detail.strAction);
+              const IconComponent = statusDetails.icon;
+              
+              return (
+                <div key={index} className="relative flex items-start mb-8 last:mb-0">
+                  {/* Timeline Dot with Icon */}
+                  <div className={`relative z-10 w-16 h-16 rounded-full border-2 border-white ${statusDetails.color} flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform duration-200`}>
+                    <IconComponent className={`w-8 h-8 ${statusDetails.iconColor}`} strokeWidth={2} />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="ml-6 flex-1">
+                    <div className="p-4 bg-white/30 backdrop-blur-sm border border-white/20 rounded-lg shadow-lg">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+                        <h4 className="text-lg font-bold text-primary">{detail.strAction.toUpperCase()}</h4>
+                        <div className="text-sm font-semibold bg-yellow-100 px-2 py-1 rounded inline-block">
+                          {formatDate(detail.strActionDate)} at {formatTime(detail.strActionTime)}
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      {detail.strOrigin && (
-                        <p><span className="font-semibold">Location:</span> {detail.strOrigin}</p>
-                      )}
-                      {detail.strDestination && (
-                        <p><span className="font-semibold">Destination:</span> {detail.strDestination}</p>
-                      )}
-                      {detail.strManifestNo && (
-                        <p><span className="font-semibold">Manifest:</span> {detail.strManifestNo}</p>
-                      )}
-                      {detail.sTrRemarks && detail.sTrRemarks.trim() !== '' && detail.sTrRemarks !== '0.00' && (
-                        <p><span className="font-semibold">Remarks:</span> {detail.sTrRemarks}</p>
-                      )}
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        {detail.strOrigin && (
+                          <p><span className="font-semibold">Location:</span> {detail.strOrigin}</p>
+                        )}
+                        {detail.strDestination && (
+                          <p><span className="font-semibold">Destination:</span> {detail.strDestination}</p>
+                        )}
+                        {detail.strManifestNo && (
+                          <p><span className="font-semibold">Manifest:</span> {detail.strManifestNo}</p>
+                        )}
+                        {detail.sTrRemarks && detail.sTrRemarks.trim() !== '' && detail.sTrRemarks !== '0.00' && (
+                          <p><span className="font-semibold">Remarks:</span> {detail.sTrRemarks}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
