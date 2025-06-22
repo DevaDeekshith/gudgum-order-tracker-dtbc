@@ -33,28 +33,43 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
     console.log("Tracking order:", formattedOrderNumber);
 
     try {
-      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook/f2bec2d1-1817-40c6-a844-addb32372930', {
+      const requestBody = {
+        orderNumber: formattedOrderNumber,
+        timestamp: new Date().toISOString(),
+      };
+      
+      console.log("Sending request to:", 'https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930');
+      console.log("Request body:", JSON.stringify(requestBody, null, 2));
+
+      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          orderNumber: formattedOrderNumber,
-          timestamp: new Date().toISOString(),
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
+      console.log("Response ok:", response.ok);
+      
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        console.error("HTTP error! status:", response.status, "text:", responseText);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log("Received tracking data:", data);
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError);
+        console.log("Response was not valid JSON:", responseText);
+        throw new Error("Invalid JSON response from server");
+      }
+      
+      console.log("Parsed tracking data:", data);
       
       if (data && data.length > 0 && data[0].statusFlag) {
         onTrackingData(data[0]);
@@ -63,13 +78,14 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
           description: "Order tracking information retrieved successfully!",
         });
       } else {
+        console.log("No valid tracking data found:", data);
         throw new Error("No tracking data found for this order");
       }
     } catch (error) {
       console.error("Error fetching tracking data:", error);
       toast({
         title: "Error",
-        description: "Failed to retrieve tracking information. Please check your order number and try again.",
+        description: `Failed to retrieve tracking information: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -83,7 +99,7 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
         <div className="relative">
           <Input
             type="text"
-            placeholder="Enter your order number (e.g., GG26099)"
+            placeholder="Enter your order number"
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
             className="h-14 text-lg bg-white/20 backdrop-blur-md border border-white/30 shadow-lg focus:bg-white/30 focus:border-white/50 transition-all duration-200"
