@@ -92,22 +92,22 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+    <div className="w-full">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="relative">
           <Input
             type="text"
-            placeholder="Enter your order number"
+            placeholder="e.g., 9X234567890"
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
-            className="h-12 md:h-14 text-base md:text-lg bg-white/20 backdrop-blur-md border border-white/30 shadow-lg focus:bg-white/30 focus:border-white/50 transition-all duration-200"
+            className="h-14 md:h-16 text-lg md:text-xl bg-white/80 backdrop-blur-md border-2 border-white/50 shadow-xl focus:bg-white/90 focus:border-primary/50 transition-all duration-200 rounded-2xl px-6"
             disabled={isLoading}
           />
         </div>
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg backdrop-blur-md transition-all duration-200"
+          className="w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-primary hover:bg-primary/90 text-white shadow-xl transition-all duration-200 rounded-2xl"
         >
           {isLoading ? 'TRACKING...' : 'TRACK YOUR ORDER'}
         </Button>
