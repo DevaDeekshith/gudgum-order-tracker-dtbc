@@ -61,13 +61,6 @@ const Index = () => {
             />
           </div>
         )}
-
-        {/* Footer */}
-        <div className="text-center mt-16">
-          <div className="bg-black/80 backdrop-blur-md text-white px-4 py-2 shadow-lg inline-block rounded-lg">
-            <p className="font-medium">Need help? Contact our support team!</p>
-          </div>
-        </div>
       </div>
     </div>
   );

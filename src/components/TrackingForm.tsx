@@ -26,25 +26,24 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
       return;
     }
 
-    // Ensure order number starts with #GG
-    const formattedOrderNumber = orderNumber.startsWith('#GG') ? orderNumber : `#GG${orderNumber}`;
-    
     setIsLoading(true);
-    console.log("Tracking order:", formattedOrderNumber);
+    console.log("Tracking order:", orderNumber);
 
     try {
-      // Build URL with query parameters for GET request
-      const webhookUrl = new URL('https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930');
-      webhookUrl.searchParams.append('orderNumber', formattedOrderNumber);
-      webhookUrl.searchParams.append('timestamp', new Date().toISOString());
+      const requestBody = {
+        orderNumber: orderNumber.trim(),
+        timestamp: new Date().toISOString(),
+      };
       
-      console.log("Sending GET request to:", webhookUrl.toString());
+      console.log("Sending POST request to webhook");
+      console.log("Request body:", JSON.stringify(requestBody, null, 2));
 
-      const response = await fetch(webhookUrl.toString(), {
-        method: 'GET',
+      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(requestBody),
       });
 
       console.log("Response status:", response.status);
@@ -69,8 +68,9 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
       
       console.log("Parsed tracking data:", data);
       
-      if (data && data.length > 0 && data[0].statusFlag) {
-        onTrackingData(data[0]);
+      // Check if the response indicates success and has tracking data
+      if (data && data.statusFlag && data.trackHeader) {
+        onTrackingData(data);
         toast({
           title: "Success",
           description: "Order tracking information retrieved successfully!",
