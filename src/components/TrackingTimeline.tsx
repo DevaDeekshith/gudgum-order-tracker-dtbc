@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Clock, Calendar, Package, Truck, CheckCircle, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
@@ -38,10 +39,9 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
   const [animateTimeline, setAnimateTimeline] = useState(false);
 
   useEffect(() => {
-    // Trigger timeline animation after component mounts
     const timer = setTimeout(() => {
       setAnimateTimeline(true);
-    }, 500);
+    }, 300);
     return () => clearTimeout(timer);
   }, []);
 
@@ -87,7 +87,7 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
         shadow: 'shadow-[0_0_40px_rgba(59,130,246,0.6)]'
       };
     }
-    if (actionLower.includes('picked up')) {
+    if (actionLower.includes('picked up') || actionLower.includes('booked')) {
       return {
         color: 'bg-gradient-to-br from-emerald-400 via-green-500 to-teal-600',
         icon: Package,
@@ -137,45 +137,65 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
     return 'bg-gradient-to-r from-gray-400 to-slate-500';
   };
 
-  // Sort details in chronological order and group transit nodes correctly
-  const sortedDetails = [...trackDetails].sort((a, b) => {
-    const dateA = new Date(`${a.strActionDate.substring(4, 8)}-${a.strActionDate.substring(2, 4)}-${a.strActionDate.substring(0, 2)}T${a.strActionTime.substring(0, 2)}:${a.strActionTime.substring(2, 4)}`);
-    const dateB = new Date(`${b.strActionDate.substring(4, 8)}-${b.strActionDate.substring(2, 4)}-${b.strActionDate.substring(0, 2)}T${b.strActionTime.substring(0, 2)}:${b.strActionTime.substring(2, 4)}`);
-    return dateB.getTime() - dateA.getTime(); // Most recent first
-  });
+  // Create a proper chronological order for the timeline
+  const createOrderedTimeline = () => {
+    const statusOrder = [
+      'softdata upload',
+      'pickup awaited', 
+      'pickup scheduled',
+      'picked up',
+      'booked',
+      'transit',
+      'reached at destination',
+      'out for delivery',
+      'delivered'
+    ];
 
-  const transitNodes = sortedDetails.filter(detail => 
-    detail.strAction.toLowerCase().includes('transit')
-  );
-  const nonTransitNodes = sortedDetails.filter(detail => 
-    !detail.strAction.toLowerCase().includes('transit')
-  );
+    // Sort details by date and time first
+    const sortedDetails = [...trackDetails].sort((a, b) => {
+      const dateTimeA = `${a.strActionDate}${a.strActionTime.padStart(4, '0')}`;
+      const dateTimeB = `${b.strActionDate}${b.strActionTime.padStart(4, '0')}`;
+      return dateTimeA.localeCompare(dateTimeB);
+    });
 
-  // Insert transit node at correct position (after softdata and booked)
-  const orderedNodes = [];
-  let transitInserted = false;
-
-  nonTransitNodes.forEach((node, index) => {
-    orderedNodes.push(node);
+    // Group transit nodes
+    const transitNodes = sortedDetails.filter(detail => 
+      detail.strAction.toLowerCase().includes('transit')
+    );
     
-    // Insert transit nodes after softdata upload or booked (whichever comes first in timeline)
-    if (!transitInserted && transitNodes.length > 0) {
-      const actionLower = node.strAction.toLowerCase();
-      if (actionLower.includes('softdata upload') || actionLower.includes('booked')) {
-        // Check if this is the last softdata/booked node before other statuses
-        const nextNode = nonTransitNodes[index + 1];
-        if (!nextNode || (!nextNode.strAction.toLowerCase().includes('softdata upload') && !nextNode.strAction.toLowerCase().includes('booked'))) {
-          orderedNodes.push({ isTransitGroup: true, transitNodes });
-          transitInserted = true;
-        }
+    const nonTransitNodes = sortedDetails.filter(detail => 
+      !detail.strAction.toLowerCase().includes('transit')
+    );
+
+    // Build ordered timeline
+    const orderedNodes = [];
+    let transitInserted = false;
+
+    for (const detail of nonTransitNodes) {
+      orderedNodes.push(detail);
+      
+      // Insert transit nodes after "booked" status
+      if (!transitInserted && detail.strAction.toLowerCase().includes('booked') && transitNodes.length > 0) {
+        orderedNodes.push({ isTransitGroup: true, transitNodes });
+        transitInserted = true;
       }
     }
-  });
 
-  // If transit nodes weren't inserted, add them at the end
-  if (!transitInserted && transitNodes.length > 0) {
-    orderedNodes.push({ isTransitGroup: true, transitNodes });
-  }
+    // If transit nodes weren't inserted yet, add them before out for delivery
+    if (!transitInserted && transitNodes.length > 0) {
+      const deliveryIndex = orderedNodes.findIndex(node => 
+        !node.isTransitGroup && node.strAction.toLowerCase().includes('out for delivery')
+      );
+      
+      if (deliveryIndex > -1) {
+        orderedNodes.splice(deliveryIndex, 0, { isTransitGroup: true, transitNodes });
+      } else {
+        orderedNodes.push({ isTransitGroup: true, transitNodes });
+      }
+    }
+
+    return orderedNodes;
+  };
 
   const renderTimelineNode = (detail: TrackingDetail, index: number, isNested = false) => {
     const statusDetails = getStatusDetails(detail.strAction);
@@ -183,13 +203,10 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
     
     return (
       <div key={index} className={`relative flex items-start ${isNested ? 'ml-8 mb-4' : 'mb-12'} last:mb-0`}>
-        {/* Timeline Dot with Icon - Unblurred and Crystal Clear */}
         <div className={`relative z-10 ${isNested ? 'w-12 h-12' : 'w-20 h-20'} rounded-2xl border-2 border-white/50 ${statusDetails.color} ${statusDetails.shadow} flex items-center justify-center transform hover:scale-110 transition-all duration-500 hover:rotate-3`}>
-          <IconComponent className={`${isNested ? 'w-6 h-6' : 'w-10 h-10'} ${statusDetails.iconColor} drop-shadow-sm`} strokeWidth={2.5} />
-          {/* Removed blur overlay for crystal clear icons */}
+          <IconComponent className={`${isNested ? 'w-6 h-6' : 'w-10 h-10'} ${statusDetails.iconColor}`} strokeWidth={2.5} />
         </div>
         
-        {/* Content */}
         <div className={`${isNested ? 'ml-4' : 'ml-8'} flex-1`}>
           <div className="p-4 md:p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/15 transition-all duration-500 hover:shadow-[0_12px_48px_rgba(0,0,0,0.15)] hover:-translate-y-1">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
@@ -232,6 +249,8 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
       </div>
     );
   };
+
+  const orderedNodes = createOrderedTimeline();
 
   return (
     <div className="w-full max-w-6xl mx-auto min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 md:p-8">
@@ -312,13 +331,13 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
           </div>
           
           <div className="relative">
-            {/* Animated Timeline Line - Bottom to Top */}
+            {/* Animated Timeline Line */}
             <div className="absolute left-8 md:left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200 rounded-full opacity-60">
               <div 
-                className={`w-full bg-gradient-to-t from-primary via-emerald-400 to-green-400 rounded-full transition-all duration-2000 ease-out ${
+                className={`w-full bg-gradient-to-t from-primary via-emerald-400 to-green-400 rounded-full transition-all duration-1500 ease-out ${
                   animateTimeline ? 'h-full' : 'h-0'
                 } origin-bottom`}
-                style={{ transitionDelay: '0.5s' }}
+                style={{ transitionDelay: '0.3s' }}
               ></div>
             </div>
             
@@ -327,12 +346,10 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
               if (item.isTransitGroup) {
                 return (
                   <div key={`transit-${index}`} className="relative flex items-start mb-12 last:mb-0">
-                    {/* Main Transit Icon */}
                     <div className="relative z-10 w-16 md:w-20 h-16 md:h-20 rounded-2xl border-2 border-white/50 bg-gradient-to-br from-indigo-500 via-purple-600 to-violet-700 shadow-[0_0_40px_rgba(99,102,241,0.6)] flex items-center justify-center transform hover:scale-110 transition-all duration-500 hover:rotate-3">
-                      <Package className="w-8 md:w-10 h-8 md:h-10 text-white drop-shadow-sm" strokeWidth={2.5} />
+                      <Package className="w-8 md:w-10 h-8 md:h-10 text-white" strokeWidth={2.5} />
                     </div>
                     
-                    {/* Transit Content */}
                     <div className="ml-6 md:ml-8 flex-1">
                       <div className="p-4 md:p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/15 transition-all duration-500">
                         <div 
