@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import TrackingForm from '../components/TrackingForm';
 import TrackingTimeline from '../components/TrackingTimeline';
+import AnimatedSplitText from '../components/SplitText';
 
 const Index = () => {
   const [trackingData, setTrackingData] = useState(null);
@@ -28,14 +29,14 @@ const Index = () => {
       <div className="container mx-auto py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <SplitText 
+          <AnimatedSplitText 
             text="GUD GUM"
             className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
             delay={100}
             duration={0.8}
           />
           <div className="mt-6 bg-white/20 backdrop-blur-xl text-slate-800 px-8 py-4 border border-white/30 shadow-xl inline-block rounded-2xl">
-            <SplitText 
+            <AnimatedSplitText 
               text="TRACK YOUR ORDER"
               className="text-xl md:text-2xl font-semibold"
               delay={50}

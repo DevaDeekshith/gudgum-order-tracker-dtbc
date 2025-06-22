@@ -17,11 +17,11 @@ interface SplitTextProps {
   to?: { opacity: number; y: number };
   threshold?: number;
   rootMargin?: string;
-  textAlign?: string;
+  textAlign?: "left" | "center" | "right" | "justify";
   onLetterAnimationComplete?: () => void;
 }
 
-const SplitText: React.FC<SplitTextProps> = ({
+const AnimatedSplitText: React.FC<SplitTextProps> = ({
   text,
   className = "",
   delay = 100,
@@ -108,4 +108,4 @@ const SplitText: React.FC<SplitTextProps> = ({
   );
 };
 
-export default SplitText;
+export default AnimatedSplitText;

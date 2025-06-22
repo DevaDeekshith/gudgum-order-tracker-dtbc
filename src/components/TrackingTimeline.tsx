@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Clock, Calendar, Package, Truck, CheckCircle, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
-import SplitText from './SplitText';
+import AnimatedSplitText from './SplitText';
 
 interface TrackingDetail {
   strCode: string;
@@ -200,7 +199,7 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
       <Card className="mb-12 bg-white/20 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.1)] rounded-3xl overflow-hidden">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <SplitText 
+            <AnimatedSplitText 
               text="ORDER DETAILS"
               className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent"
               delay={50}
@@ -264,7 +263,7 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
       <Card className="bg-white/20 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.1)] rounded-3xl overflow-hidden">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <SplitText 
+            <AnimatedSplitText 
               text="TRACKING TIMELINE"
               className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent"
               delay={50}
