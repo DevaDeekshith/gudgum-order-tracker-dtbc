@@ -33,20 +33,18 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
     console.log("Tracking order:", formattedOrderNumber);
 
     try {
-      const requestBody = {
-        orderNumber: formattedOrderNumber,
-        timestamp: new Date().toISOString(),
-      };
+      // Build URL with query parameters for GET request
+      const webhookUrl = new URL('https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930');
+      webhookUrl.searchParams.append('orderNumber', formattedOrderNumber);
+      webhookUrl.searchParams.append('timestamp', new Date().toISOString());
       
-      console.log("Sending request to:", 'https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930');
-      console.log("Request body:", JSON.stringify(requestBody, null, 2));
+      console.log("Sending GET request to:", webhookUrl.toString());
 
-      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930', {
-        method: 'POST',
+      const response = await fetch(webhookUrl.toString(), {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
       });
 
       console.log("Response status:", response.status);
