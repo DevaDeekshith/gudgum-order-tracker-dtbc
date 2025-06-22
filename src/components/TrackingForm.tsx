@@ -47,11 +47,11 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
         timestamp: new Date().toISOString(),
       };
       
-      console.log("Sending POST request to webhook");
+      console.log("Sending POST request to test webhook");
       console.log("Request body:", JSON.stringify(requestBody, null, 2));
-      console.log("Webhook URL:", 'https://ultimate-n8n-sqfb.onrender.com/webhook/f2bec2d1-1817-40c6-a844-addb32372930');
+      console.log("Test Webhook URL:", 'https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930');
 
-      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook/f2bec2d1-1817-40c6-a844-addb32372930', {
+      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
