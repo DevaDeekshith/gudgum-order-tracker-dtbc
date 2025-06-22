@@ -86,16 +86,11 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
       
       // Check if the response indicates success and has tracking data
       if (data && data.statusFlag && data.trackHeader && data.trackDetails) {
-        // Verify that we got data for the correct order number
-        if (data.trackHeader.strRefNo && data.trackHeader.strRefNo.includes('#')) {
-          onTrackingData(data);
-          toast({
-            title: "Success",
-            description: "Order tracking information retrieved successfully!",
-          });
-        } else {
-          throw new Error("No tracking data found for this order number.");
-        }
+        onTrackingData(data);
+        toast({
+          title: "Success",
+          description: "Order tracking information retrieved successfully!",
+        });
       } else if (data && !data.statusFlag) {
         throw new Error(data.errorDetails || "No tracking data found for this order number.");
       } else {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Clock, Calendar, Package, Truck, CheckCircle, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
@@ -137,25 +136,13 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
     return 'bg-gradient-to-r from-gray-400 to-slate-500';
   };
 
-  // Create a proper chronological order for the timeline
+  // Create a proper chronological order for the timeline (REVERSED - Delivered first)
   const createOrderedTimeline = () => {
-    const statusOrder = [
-      'softdata upload',
-      'pickup awaited', 
-      'pickup scheduled',
-      'picked up',
-      'booked',
-      'transit',
-      'reached at destination',
-      'out for delivery',
-      'delivered'
-    ];
-
     // Sort details by date and time first
     const sortedDetails = [...trackDetails].sort((a, b) => {
       const dateTimeA = `${a.strActionDate}${a.strActionTime.padStart(4, '0')}`;
       const dateTimeB = `${b.strActionDate}${b.strActionTime.padStart(4, '0')}`;
-      return dateTimeA.localeCompare(dateTimeB);
+      return dateTimeB.localeCompare(dateTimeA); // Reverse order - latest first
     });
 
     // Group transit nodes
@@ -167,30 +154,32 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
       !detail.strAction.toLowerCase().includes('transit')
     );
 
-    // Build ordered timeline
+    // Build ordered timeline (reversed)
     const orderedNodes = [];
     let transitInserted = false;
 
     for (const detail of nonTransitNodes) {
-      orderedNodes.push(detail);
-      
-      // Insert transit nodes after "booked" status
-      if (!transitInserted && detail.strAction.toLowerCase().includes('booked') && transitNodes.length > 0) {
+      // Insert transit nodes after "out for delivery" and before "booked"
+      if (!transitInserted && 
+          detail.strAction.toLowerCase().includes('booked') && 
+          transitNodes.length > 0) {
         orderedNodes.push({ isTransitGroup: true, transitNodes });
         transitInserted = true;
       }
+      
+      orderedNodes.push(detail);
     }
 
-    // If transit nodes weren't inserted yet, add them before out for delivery
+    // If transit nodes weren't inserted yet, add them after delivered
     if (!transitInserted && transitNodes.length > 0) {
-      const deliveryIndex = orderedNodes.findIndex(node => 
-        !node.isTransitGroup && node.strAction.toLowerCase().includes('out for delivery')
+      const deliveredIndex = orderedNodes.findIndex(node => 
+        !node.isTransitGroup && node.strAction.toLowerCase().includes('delivered')
       );
       
-      if (deliveryIndex > -1) {
-        orderedNodes.splice(deliveryIndex, 0, { isTransitGroup: true, transitNodes });
+      if (deliveredIndex > -1) {
+        orderedNodes.splice(deliveredIndex + 1, 0, { isTransitGroup: true, transitNodes });
       } else {
-        orderedNodes.push({ isTransitGroup: true, transitNodes });
+        orderedNodes.unshift({ isTransitGroup: true, transitNodes });
       }
     }
 
@@ -334,9 +323,9 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
             {/* Animated Timeline Line */}
             <div className="absolute left-8 md:left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200 rounded-full opacity-60">
               <div 
-                className={`w-full bg-gradient-to-t from-primary via-emerald-400 to-green-400 rounded-full transition-all duration-1500 ease-out ${
+                className={`w-full bg-gradient-to-b from-primary via-emerald-400 to-green-400 rounded-full transition-all duration-1500 ease-out ${
                   animateTimeline ? 'h-full' : 'h-0'
-                } origin-bottom`}
+                } origin-top`}
                 style={{ transitionDelay: '0.3s' }}
               ></div>
             </div>
