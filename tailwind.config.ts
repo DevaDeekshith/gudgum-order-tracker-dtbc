@@ -26,7 +26,7 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#DC2626', // Gud Gum Red
+					DEFAULT: '#3f805a', // New Gud Gum Green
 					foreground: '#FFFFFF'
 				},
 				secondary: {
@@ -117,13 +117,36 @@ export default {
 						transform: 'translateY(0)',
 						opacity: '1'
 					}
+				},
+				'line-draw': {
+					'0%': {
+						strokeDashoffset: '1000',
+						opacity: '0'
+					},
+					'20%': {
+						opacity: '1'
+					},
+					'100%': {
+						strokeDashoffset: '0',
+						opacity: '1'
+					}
+				},
+				'timeline-draw': {
+					'0%': {
+						height: '0%'
+					},
+					'100%': {
+						height: '100%'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'bounce-in': 'bounce-in 0.6s ease-out',
-				'slide-up': 'slide-up 0.4s ease-out'
+				'slide-up': 'slide-up 0.4s ease-out',
+				'line-draw': 'line-draw 2s ease-out forwards',
+				'timeline-draw': 'timeline-draw 2s ease-out forwards'
 			},
 			boxShadow: {
 				'neubrutalism': '4px 4px 0px 0px #000000',

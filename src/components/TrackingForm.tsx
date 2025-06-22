@@ -38,7 +38,7 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
       console.log("Sending POST request to webhook");
       console.log("Request body:", JSON.stringify(requestBody, null, 2));
 
-      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook-test/f2bec2d1-1817-40c6-a844-addb32372930', {
+      const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook/f2bec2d1-1817-40c6-a844-addb32372930', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,22 +92,22 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
   };
 
   return (
-    <div className="w-full max-w-md mx-auto mb-8">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="w-full max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
         <div className="relative">
           <Input
             type="text"
             placeholder="Enter your order number"
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
-            className="h-14 text-lg bg-white/20 backdrop-blur-md border border-white/30 shadow-lg focus:bg-white/30 focus:border-white/50 transition-all duration-200"
+            className="h-12 md:h-14 text-base md:text-lg bg-white/20 backdrop-blur-md border border-white/30 shadow-lg focus:bg-white/30 focus:border-white/50 transition-all duration-200"
             disabled={isLoading}
           />
         </div>
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg backdrop-blur-md transition-all duration-200"
+          className="w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg backdrop-blur-md transition-all duration-200"
         >
           {isLoading ? 'TRACKING...' : 'TRACK YOUR ORDER'}
         </Button>

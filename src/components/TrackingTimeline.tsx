@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Clock, Calendar, Package, Truck, CheckCircle, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import AnimatedSplitText from './SplitText';
@@ -35,6 +35,15 @@ interface TrackingTimelineProps {
 
 const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackDetails }) => {
   const [isTransitExpanded, setIsTransitExpanded] = useState(false);
+  const [animateTimeline, setAnimateTimeline] = useState(false);
+
+  useEffect(() => {
+    // Trigger timeline animation after component mounts
+    const timer = setTimeout(() => {
+      setAnimateTimeline(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr || dateStr.length !== 8) return dateStr;
@@ -143,47 +152,47 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
     
     return (
       <div key={index} className={`relative flex items-start ${isNested ? 'ml-8 mb-4' : 'mb-12'} last:mb-0`}>
-        {/* Timeline Dot with Icon */}
-        <div className={`relative z-10 ${isNested ? 'w-12 h-12' : 'w-20 h-20'} rounded-2xl backdrop-blur-xl border border-white/30 ${statusDetails.color} ${statusDetails.shadow} flex items-center justify-center transform hover:scale-110 transition-all duration-500 hover:rotate-3`}>
-          <IconComponent className={`${isNested ? 'w-6 h-6' : 'w-10 h-10'} ${statusDetails.iconColor}`} strokeWidth={2.5} />
-          <div className="absolute inset-0 rounded-2xl bg-white/20 backdrop-blur-sm"></div>
+        {/* Timeline Dot with Icon - Unblurred and Crystal Clear */}
+        <div className={`relative z-10 ${isNested ? 'w-12 h-12' : 'w-20 h-20'} rounded-2xl border-2 border-white/50 ${statusDetails.color} ${statusDetails.shadow} flex items-center justify-center transform hover:scale-110 transition-all duration-500 hover:rotate-3`}>
+          <IconComponent className={`${isNested ? 'w-6 h-6' : 'w-10 h-10'} ${statusDetails.iconColor} drop-shadow-sm`} strokeWidth={2.5} />
+          {/* Removed blur overlay for crystal clear icons */}
         </div>
         
         {/* Content */}
         <div className={`${isNested ? 'ml-4' : 'ml-8'} flex-1`}>
-          <div className="p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/15 transition-all duration-500 hover:shadow-[0_12px_48px_rgba(0,0,0,0.15)] hover:-translate-y-1">
+          <div className="p-4 md:p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/15 transition-all duration-500 hover:shadow-[0_12px_48px_rgba(0,0,0,0.15)] hover:-translate-y-1">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-              <h4 className={`${isNested ? 'text-base' : 'text-xl'} font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent`}>
+              <h4 className={`${isNested ? 'text-sm md:text-base' : 'text-lg md:text-xl'} font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent`}>
                 {detail.strAction.toUpperCase()}
               </h4>
-              <div className="text-sm font-semibold bg-gradient-to-r from-amber-400 to-orange-500 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm">
+              <div className="text-xs md:text-sm font-semibold bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 md:px-4 py-1 md:py-2 rounded-full shadow-lg backdrop-blur-sm mt-2 lg:mt-0">
                 {formatDate(detail.strActionDate)} at {formatTime(detail.strActionTime)}
               </div>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-sm text-slate-700">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-4 text-xs md:text-sm text-slate-700">
               {detail.strOrigin && (
-                <p className="flex items-center gap-2">
+                <p className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                   <span className="font-semibold text-slate-800">Location:</span> 
-                  <span className="bg-slate-100/80 px-3 py-1 rounded-full">{detail.strOrigin}</span>
+                  <span className="bg-slate-100/80 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">{detail.strOrigin}</span>
                 </p>
               )}
               {detail.strDestination && (
-                <p className="flex items-center gap-2">
+                <p className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                   <span className="font-semibold text-slate-800">Destination:</span> 
-                  <span className="bg-slate-100/80 px-3 py-1 rounded-full">{detail.strDestination}</span>
+                  <span className="bg-slate-100/80 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">{detail.strDestination}</span>
                 </p>
               )}
               {detail.strManifestNo && (
-                <p className="flex items-center gap-2">
+                <p className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                   <span className="font-semibold text-slate-800">Manifest:</span> 
-                  <span className="bg-slate-100/80 px-3 py-1 rounded-full">{detail.strManifestNo}</span>
+                  <span className="bg-slate-100/80 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">{detail.strManifestNo}</span>
                 </p>
               )}
               {detail.sTrRemarks && detail.sTrRemarks.trim() !== '' && detail.sTrRemarks !== '0.00' && (
-                <p className="flex items-center gap-2 lg:col-span-2">
+                <p className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 lg:col-span-2">
                   <span className="font-semibold text-slate-800">Remarks:</span> 
-                  <span className="bg-slate-100/80 px-3 py-1 rounded-full">{detail.sTrRemarks}</span>
+                  <span className="bg-slate-100/80 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">{detail.sTrRemarks}</span>
                 </p>
               )}
             </div>
@@ -194,35 +203,35 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8">
+    <div className="w-full max-w-6xl mx-auto min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 md:p-8">
       {/* Header Card */}
-      <Card className="mb-12 bg-white/20 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.1)] rounded-3xl overflow-hidden">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
+      <Card className="mb-8 md:mb-12 bg-white/20 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.1)] rounded-3xl overflow-hidden">
+        <CardContent className="p-4 md:p-8">
+          <div className="text-center mb-6 md:mb-8">
             <AnimatedSplitText 
               text="ORDER DETAILS"
-              className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent"
+              className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent"
               delay={50}
               duration={0.8}
             />
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="p-6 bg-white/30 backdrop-blur-sm rounded-2xl border border-white/20">
-                <h3 className="text-lg font-semibold mb-4 text-slate-800">Order Information</h3>
-                <div className="space-y-3">
-                  <p className="flex justify-between items-center">
-                    <span className="font-medium text-slate-700">Order Number:</span> 
-                    <span className="bg-slate-100 px-3 py-1 rounded-full text-sm font-mono">{trackHeader.strRefNo}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+            <div className="space-y-4 md:space-y-6">
+              <div className="p-4 md:p-6 bg-white/30 backdrop-blur-sm rounded-2xl border border-white/20">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-slate-800">Order Information</h3>
+                <div className="space-y-2 md:space-y-3">
+                  <p className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
+                    <span className="font-medium text-slate-700 text-sm md:text-base">Order Number:</span> 
+                    <span className="bg-slate-100 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-mono">{trackHeader.strRefNo}</span>
                   </p>
-                  <p className="flex justify-between items-center">
-                    <span className="font-medium text-slate-700">Tracking Number:</span> 
-                    <span className="bg-slate-100 px-3 py-1 rounded-full text-sm font-mono">{trackHeader.strShipmentNo}</span>
+                  <p className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
+                    <span className="font-medium text-slate-700 text-sm md:text-base">Tracking Number:</span> 
+                    <span className="bg-slate-100 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-mono">{trackHeader.strShipmentNo}</span>
                   </p>
-                  <p className="flex justify-between items-center">
-                    <span className="font-medium text-slate-700">Status:</span>
-                    <span className={`px-4 py-2 rounded-full text-white font-semibold text-sm shadow-lg ${getStatusColor(trackHeader.strStatus)}`}>
+                  <p className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
+                    <span className="font-medium text-slate-700 text-sm md:text-base">Status:</span>
+                    <span className={`px-3 md:px-4 py-1 md:py-2 rounded-full text-white font-semibold text-xs md:text-sm shadow-lg ${getStatusColor(trackHeader.strStatus)}`}>
                       {trackHeader.strStatus.toUpperCase()}
                     </span>
                   </p>
@@ -230,26 +239,26 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
               </div>
             </div>
             
-            <div className="space-y-6">
-              <div className="p-6 bg-white/30 backdrop-blur-sm rounded-2xl border border-white/20">
-                <h3 className="text-lg font-semibold mb-4 text-slate-800">Shipping Information</h3>
-                <div className="space-y-3">
-                  <p className="flex justify-between items-center">
-                    <span className="font-medium text-slate-700">From:</span> 
-                    <span className="bg-slate-100 px-3 py-1 rounded-full text-sm">{trackHeader.strOrigin}</span>
+            <div className="space-y-4 md:space-y-6">
+              <div className="p-4 md:p-6 bg-white/30 backdrop-blur-sm rounded-2xl border border-white/20">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-slate-800">Shipping Information</h3>
+                <div className="space-y-2 md:space-y-3">
+                  <p className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
+                    <span className="font-medium text-slate-700 text-sm md:text-base">From:</span> 
+                    <span className="bg-slate-100 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">{trackHeader.strOrigin}</span>
                   </p>
-                  <p className="flex justify-between items-center">
-                    <span className="font-medium text-slate-700">To:</span> 
-                    <span className="bg-slate-100 px-3 py-1 rounded-full text-sm">{trackHeader.strDestination}</span>
+                  <p className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
+                    <span className="font-medium text-slate-700 text-sm md:text-base">To:</span> 
+                    <span className="bg-slate-100 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">{trackHeader.strDestination}</span>
                   </p>
-                  <p className="flex justify-between items-center">
-                    <span className="font-medium text-slate-700">Expected Delivery:</span> 
-                    <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">{formatDate(trackHeader.strExpectedDeliveryDate)}</span>
+                  <p className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
+                    <span className="font-medium text-slate-700 text-sm md:text-base">Expected Delivery:</span> 
+                    <span className="bg-emerald-100 text-emerald-800 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-semibold">{formatDate(trackHeader.strExpectedDeliveryDate)}</span>
                   </p>
                   {trackHeader.strRemarks && (
-                    <p className="flex justify-between items-center">
-                      <span className="font-medium text-slate-700">Delivered To:</span> 
-                      <span className="bg-slate-100 px-3 py-1 rounded-full text-sm">{trackHeader.strRemarks}</span>
+                    <p className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
+                      <span className="font-medium text-slate-700 text-sm md:text-base">Delivered To:</span> 
+                      <span className="bg-slate-100 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">{trackHeader.strRemarks}</span>
                     </p>
                   )}
                 </div>
@@ -261,19 +270,26 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
 
       {/* Timeline */}
       <Card className="bg-white/20 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.1)] rounded-3xl overflow-hidden">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
+        <CardContent className="p-4 md:p-8">
+          <div className="text-center mb-6 md:mb-8">
             <AnimatedSplitText 
               text="TRACKING TIMELINE"
-              className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent"
+              className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent"
               delay={50}
               duration={0.8}
             />
           </div>
           
           <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200 rounded-full opacity-60"></div>
+            {/* Animated Timeline Line - Bottom to Top */}
+            <div className="absolute left-8 md:left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200 rounded-full opacity-60">
+              <div 
+                className={`w-full bg-gradient-to-t from-primary via-emerald-400 to-green-400 rounded-full transition-all duration-2000 ease-out ${
+                  animateTimeline ? 'h-full' : 'h-0'
+                } origin-bottom`}
+                style={{ transitionDelay: '0.5s' }}
+              ></div>
+            </div>
             
             {/* Render non-transit nodes first */}
             {nonTransitNodes.map((detail, index) => renderTimelineNode(detail, index))}
@@ -282,26 +298,25 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
             {transitNodes.length > 0 && (
               <div className="relative flex items-start mb-12 last:mb-0">
                 {/* Main Transit Icon */}
-                <div className="relative z-10 w-20 h-20 rounded-2xl backdrop-blur-xl border border-white/30 bg-gradient-to-br from-indigo-500 via-purple-600 to-violet-700 shadow-[0_0_40px_rgba(99,102,241,0.6)] flex items-center justify-center transform hover:scale-110 transition-all duration-500 hover:rotate-3">
-                  <Package className="w-10 h-10 text-white" strokeWidth={2.5} />
-                  <div className="absolute inset-0 rounded-2xl bg-white/20 backdrop-blur-sm"></div>
+                <div className="relative z-10 w-16 md:w-20 h-16 md:h-20 rounded-2xl border-2 border-white/50 bg-gradient-to-br from-indigo-500 via-purple-600 to-violet-700 shadow-[0_0_40px_rgba(99,102,241,0.6)] flex items-center justify-center transform hover:scale-110 transition-all duration-500 hover:rotate-3">
+                  <Package className="w-8 md:w-10 h-8 md:h-10 text-white drop-shadow-sm" strokeWidth={2.5} />
                 </div>
                 
                 {/* Transit Content */}
-                <div className="ml-8 flex-1">
-                  <div className="p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/15 transition-all duration-500">
+                <div className="ml-6 md:ml-8 flex-1">
+                  <div className="p-4 md:p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/15 transition-all duration-500">
                     <div 
                       className="flex items-center justify-between cursor-pointer"
                       onClick={() => setIsTransitExpanded(!isTransitExpanded)}
                     >
-                      <h4 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                      <h4 className="text-lg md:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                         IN TRANSIT ({transitNodes.length} UPDATES)
                       </h4>
                       <div className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-300">
                         {isTransitExpanded ? (
-                          <ChevronUp className="w-5 h-5 text-slate-700" />
+                          <ChevronUp className="w-4 md:w-5 h-4 md:h-5 text-slate-700" />
                         ) : (
-                          <ChevronDown className="w-5 h-5 text-slate-700" />
+                          <ChevronDown className="w-4 md:w-5 h-4 md:h-5 text-slate-700" />
                         )}
                       </div>
                     </div>
@@ -309,7 +324,7 @@ const TrackingTimeline: React.FC<TrackingTimelineProps> = ({ trackHeader, trackD
                     {isTransitExpanded && (
                       <div className="mt-6 space-y-4 animate-slide-up">
                         <div className="relative">
-                          <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-300 to-purple-300 rounded-full opacity-50"></div>
+                          <div className="absolute left-4 md:left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-300 to-purple-300 rounded-full opacity-50"></div>
                           {transitNodes.map((detail, index) => renderTimelineNode(detail, index, true))}
                         </div>
                       </div>
