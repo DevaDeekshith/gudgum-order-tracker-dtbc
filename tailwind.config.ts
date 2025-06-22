@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,12 +26,12 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#DC2626', // Gud Gum Red
+					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#16A34A', // Gud Gum Green
+					foreground: '#FFFFFF'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Neubrutalism colors
+				'neubrutalism': {
+					yellow: '#FBBF24',
+					pink: '#EC4899',
+					purple: '#8B5CF6',
+					blue: '#3B82F6',
+					black: '#000000',
+					white: '#FFFFFF'
 				}
 			},
 			borderRadius: {
@@ -84,11 +94,40 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'bounce-in': {
+					'0%': {
+						transform: 'scale(0.3) rotate(-5deg)',
+						opacity: '0'
+					},
+					'50%': {
+						transform: 'scale(1.05) rotate(2deg)'
+					},
+					'100%': {
+						transform: 'scale(1) rotate(0deg)',
+						opacity: '1'
+					}
+				},
+				'slide-up': {
+					'0%': {
+						transform: 'translateY(20px)',
+						opacity: '0'
+					},
+					'100%': {
+						transform: 'translateY(0)',
+						opacity: '1'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'bounce-in': 'bounce-in 0.6s ease-out',
+				'slide-up': 'slide-up 0.4s ease-out'
+			},
+			boxShadow: {
+				'neubrutalism': '4px 4px 0px 0px #000000',
+				'neubrutalism-lg': '8px 8px 0px 0px #000000',
 			}
 		}
 	},
