@@ -38,16 +38,18 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
     }
 
     setIsLoading(true);
-    console.log("Tracking order:", orderNumber.trim());
+    const submittedOrderNumber = orderNumber.trim();
+    console.log("Tracking order:", submittedOrderNumber);
 
     try {
       const requestBody = {
-        orderNumber: orderNumber.trim(),
+        orderNumber: submittedOrderNumber,
         timestamp: new Date().toISOString(),
       };
       
       console.log("Sending POST request to webhook");
       console.log("Request body:", JSON.stringify(requestBody, null, 2));
+      console.log("Webhook URL:", 'https://ultimate-n8n-sqfb.onrender.com/webhook/f2bec2d1-1817-40c6-a844-addb32372930');
 
       const response = await fetch('https://ultimate-n8n-sqfb.onrender.com/webhook/f2bec2d1-1817-40c6-a844-addb32372930', {
         method: 'POST',
@@ -83,26 +85,46 @@ const TrackingForm: React.FC<TrackingFormProps> = ({ onTrackingData, isLoading, 
       }
       
       console.log("Parsed tracking data:", data);
+      console.log("Submitted order number:", submittedOrderNumber);
+      console.log("Response tracking number:", data?.trackHeader?.strShipmentNo);
       
       // Check if the response indicates success and has tracking data
       if (data && data.statusFlag && data.trackHeader && data.trackDetails) {
-        onTrackingData(data);
-        toast({
-          title: "Success",
-          description: "Order tracking information retrieved successfully!",
-        });
+        // Verify this is actually tracking data (not an error response)
+        if (data.trackHeader.strShipmentNo || data.trackHeader.strRefNo) {
+          onTrackingData(data);
+          toast({
+            title: "Success",
+            description: `Order tracking information retrieved for ${data.trackHeader.strRefNo || data.trackHeader.strShipmentNo}`,
+          });
+        } else {
+          throw new Error("No valid tracking data found in response.");
+        }
       } else if (data && !data.statusFlag) {
-        throw new Error(data.errorDetails || "No tracking data found for this order number.");
+        // Handle explicit error responses from the webhook
+        const errorMessage = data.errorDetails || "No tracking data found for this order number.";
+        throw new Error(errorMessage);
       } else {
-        throw new Error("No tracking data found for this order number. Please verify your tracking number.");
+        // Handle missing or invalid data structure
+        throw new Error("No tracking data found for this order number. Please verify your tracking number and try again.");
       }
     } catch (error) {
       console.error("Error fetching tracking data:", error);
-      toast({
-        title: "Tracking Error",
-        description: error.message || "Failed to retrieve tracking information. Please check your tracking number and try again.",
-        variant: "destructive",
-      });
+      
+      // Check if it's a network error
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast({
+          title: "Connection Error",
+          description: "Unable to connect to tracking service. Please check your internet connection and try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Tracking Error",
+          description: error.message || "Failed to retrieve tracking information. Please check your tracking number and try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
