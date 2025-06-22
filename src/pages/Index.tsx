@@ -43,11 +43,14 @@ const Index = () => {
             {/* Main Heading */}
             <div className="text-center mb-8">
               <AnimatedSplitText 
-                text="Enter your order number"
-                className="text-xl md:text-2xl lg:text-3xl font-semibold text-slate-800 mb-8"
+                text="We're here to help you track your order"
+                className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-800 mb-4 leading-tight"
                 delay={50}
                 duration={0.6}
               />
+              <p className="text-lg md:text-xl text-slate-600 font-medium">
+                Simply enter your tracking number below and we'll show you exactly where your package is
+              </p>
             </div>
 
             {/* Search Form */}
