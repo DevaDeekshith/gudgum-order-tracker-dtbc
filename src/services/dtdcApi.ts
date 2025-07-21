@@ -46,62 +46,53 @@ const DTDC_CONFIG = {
 };
 
 /**
- * Track shipment using DTDC native API
+ * Track shipment using Supabase Edge Function (secure backend proxy)
  * @param trackingNumber - The tracking/consignment number to track
  * @returns Promise<DTDCApiResponse>
  */
 export const trackShipment = async (trackingNumber: string): Promise<DTDCApiResponse> => {
-  console.log('Tracking shipment with DTDC native API:', trackingNumber);
-  
-  const requestBody: TrackShipmentRequest = {
-    trkType: "cnno",
-    strcnno: trackingNumber.trim(),
-    addtnlDtl: "Y"
-  };
-
-  console.log('DTDC API Request body:', JSON.stringify(requestBody, null, 2));
-  console.log('DTDC API URL:', DTDC_CONFIG.apiUrl);
+  console.log('Tracking shipment via Supabase Edge Function:', trackingNumber);
 
   try {
-    const response = await fetch(DTDC_CONFIG.apiUrl, {
+    const response = await fetch('https://kgtjdbyzxaearguhvrja.supabase.co/functions/v1/dtdc-tracker', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': DTDC_CONFIG.accessToken,
-        'Cookie': DTDC_CONFIG.cookie,
-        'Accept': 'application/json'
+        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtndGpkYnl6eGFlYXJndWh2cmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2MTIyNzAsImV4cCI6MjA2NjE4ODI3MH0.m_8lQ2ohMPzoUs5-zSyneI5ACdl-yX0XyjI_j_dUN0g`
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({ trackingNumber: trackingNumber.trim() })
     });
 
-    console.log('DTDC API Response status:', response.status);
-    console.log('DTDC API Response ok:', response.ok);
+    console.log('Edge Function Response status:', response.status);
+    console.log('Edge Function Response ok:', response.ok);
 
     if (!response.ok) {
-      throw new Error(`DTDC API error (${response.status}): ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Edge Function Error:', errorText);
+      throw new Error(`Tracking service error (${response.status}): Unable to connect to tracking service`);
     }
 
     const responseText = await response.text();
-    console.log('DTDC API Raw response:', responseText);
+    console.log('Edge Function Raw response:', responseText);
 
     let data: DTDCApiResponse;
     try {
       data = JSON.parse(responseText);
     } catch (parseError) {
-      console.error('DTDC API JSON parse error:', parseError);
-      throw new Error('Invalid response format from DTDC API');
+      console.error('Edge Function JSON parse error:', parseError);
+      throw new Error('Invalid response format from tracking service');
     }
 
-    console.log('DTDC API Parsed response:', data);
+    console.log('Edge Function Parsed response:', data);
 
     // Validate response structure
     if (!data || typeof data.statusFlag === 'undefined') {
-      throw new Error('Invalid response structure from DTDC API');
+      throw new Error('Invalid response structure from tracking service');
     }
 
     return data;
   } catch (error) {
-    console.error('DTDC API Error:', error);
+    console.error('Tracking Service Error:', error);
     throw error;
   }
 };
