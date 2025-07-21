@@ -54,26 +54,32 @@ export const trackShipment = async (trackingNumber: string): Promise<DTDCApiResp
   console.log('Tracking shipment via Supabase Edge Function:', trackingNumber);
 
   try {
+    // Input validation and sanitization
+    const sanitizedTrackingNumber = trackingNumber.trim().replace(/[^a-zA-Z0-9]/g, '');
+    
+    if (!sanitizedTrackingNumber || sanitizedTrackingNumber.length < 5 || sanitizedTrackingNumber.length > 20) {
+      throw new Error('Invalid tracking number format');
+    }
+
     const response = await fetch('https://kgtjdbyzxaearguhvrja.supabase.co/functions/v1/dtdc-tracker', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtndGpkYnl6eGFlYXJndWh2cmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2MTIyNzAsImV4cCI6MjA2NjE4ODI3MH0.m_8lQ2ohMPzoUs5-zSyneI5ACdl-yX0XyjI_j_dUN0g`
       },
-      body: JSON.stringify({ trackingNumber: trackingNumber.trim() })
+      body: JSON.stringify({ trackingNumber: sanitizedTrackingNumber })
     });
 
     console.log('Edge Function Response status:', response.status);
-    console.log('Edge Function Response ok:', response.ok);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Edge Function Error:', errorText);
+      console.error('Edge Function Error - Status:', response.status);
       throw new Error(`Tracking service error (${response.status}): Unable to connect to tracking service`);
     }
 
     const responseText = await response.text();
-    console.log('Edge Function Raw response:', responseText);
+    console.log('Edge Function response received successfully');
 
     let data: DTDCApiResponse;
     try {
@@ -83,7 +89,7 @@ export const trackShipment = async (trackingNumber: string): Promise<DTDCApiResp
       throw new Error('Invalid response format from tracking service');
     }
 
-    console.log('Edge Function Parsed response:', data);
+    console.log('Edge Function response parsed successfully');
 
     // Validate response structure
     if (!data || typeof data.statusFlag === 'undefined') {

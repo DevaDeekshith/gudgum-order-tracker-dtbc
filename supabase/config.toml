@@ -1,1 +1,4 @@
 project_id = "kgtjdbyzxaearguhvrja"
+
+[functions.dtdc-tracker]
+verify_jwt = false
